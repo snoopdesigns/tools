@@ -1,0 +1,56 @@
+#!/bin/bash
+
+CHECKUPDATES=checkupdates
+PACMAN_UPDATE="pacman -S nano"
+
+get_terminal() {
+  terms=(gnome-terminal rxvt urxvt)
+  for t in ${terms[*]}
+  do
+    if [ $(command -v $t) ]
+    then
+      detected_term=$t
+      break
+    fi
+  done
+  echo $detected_term
+}
+
+notify() {
+  result=$(notify-send --action=install=Install --action=cancel=Abort "Pacman updates available" "The following updates available:\n\n$1\n\nWould you like to install them?")
+  if [[ "$result" == "install" ]]; then
+    return 0
+  else
+    return 1
+  fi
+}
+
+invoke_pacman_update() {
+  if is_superuser; then
+    echo "Running as superuser"
+    $TERMINAL -e bash -c "$PACMAN_UPDATE"
+  else
+    echo "Runnning with sudo"
+    $TERMINAL -e bash -c "sudo $PACMAN_UPDATE"
+  fi
+}
+
+is_superuser() {
+  if [ "$EUID" -ne 0 ]; then
+    return 1
+  else
+    return 0
+  fi
+}
+
+main() {
+  updates_available=$($CHECKUPDATES)
+  if [ -n "${updates_available}" ]; then
+    if notify "$updates_available"; then
+      invoke_pacman_update
+    fi
+  fi
+}
+
+TERMINAL=$(get_terminal)
+main
