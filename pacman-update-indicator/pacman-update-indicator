@@ -17,6 +17,9 @@ get_terminal() {
 }
 
 notify() {
+  # Export environment variables in order for notify-send to understand which display and DBUS address to use
+  export DISPLAY=:0
+  export DBUS_SESSION_BUS_ADDRESS=unix:path=/run/user/1000/bus
   result=$(notify-send --action=install=Install --action=cancel=Abort "Pacman updates available" "The following updates available:\n\n$1\n\nWould you like to install them?")
   if [[ "$result" == "install" ]]; then
     return 0
