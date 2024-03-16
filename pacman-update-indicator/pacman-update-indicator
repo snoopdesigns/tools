@@ -1,7 +1,7 @@
 #!/bin/bash
 
 CHECKUPDATES=checkupdates
-PACMAN_UPDATE="pacman -S nano"
+PACMAN_UPDATE="pacman -Syu"
 
 get_terminal() {
   terms=(gnome-terminal rxvt urxvt)
